@@ -1,3 +1,4 @@
+import os
 from flask import Flask, abort
 import mysql.connector as mysql
 from settings import dbpwd
@@ -6,12 +7,17 @@ from flask_socketio import SocketIO
 from flask_cors import CORS
 
 
-db = mysql.connect(
-    host="127.0.0.1",
-    user="root",
-    passwd=dbpwd,
-    database="moveo")
+# db = mysql.connect(
+# host = "127.0.0.1",
+# user = "root",
+# passwd = dbpwd,
+# database = "moveo")
 
+db = mysql.connect(
+    host="containers-us-west-83.railway.app",
+    user="root",
+    passwd="MbWhhASn1kFtyKrjYSlS",
+    database="railway")
 
 # For build:
 app = Flask(__name__,
@@ -19,7 +25,7 @@ app = Flask(__name__,
             static_url_path='/')
 
 
-@app.route('/')
+@ app.route('/')
 def index():
     return app.send_static_file('index.html')
 
@@ -30,7 +36,7 @@ CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 
-@app.route('/codelinks', methods=['GET'])
+@ app.route('/codelinks', methods=['GET'])
 def get_links():
     query = "SELECT id, title from codeblocks"
     cursor = db.cursor()
@@ -46,7 +52,7 @@ def get_links():
     return json.dumps(data)
 
 
-@app.route('/codeblock/<int:id>', methods=['GET'])
+@ app.route('/codeblock/<int:id>', methods=['GET'])
 def get_code(id):
     query = "SELECT id, title, code, code_solution FROM codeblocks WHERE id = %s"
     values = (id,)
@@ -60,12 +66,12 @@ def get_code(id):
     return json.dumps(dict(zip(headers, record)))
 
 
-@socketio.on('connect')
+@ socketio.on('connect')
 def handle_connect():
     print("client connected")
 
 
-@socketio.on('code_change')
+@ socketio.on('code_change')
 def handle_code_change(data):
     print("change io")
     id = data['id']
